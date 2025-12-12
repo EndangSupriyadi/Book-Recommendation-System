@@ -119,7 +119,7 @@ Jumlah Baris Unik (berdasarkan Title & Author): 251185 <br>
 Jumlah Baris Duplikat yang Akan Dihapus: 20175 <br>
 
 
-   Pada gambar 1 yaitu memvisualisasikan dan meneliti distribusi rating dataframe. Rating terbanyak adalah 0 dan terendah adalaah 1, disini berarti kebanyakan orang tidak suka bukunya sehingga memberikan rating 0<br>
+   Pada gambar 1 yaitu memvisualisasikan dan meneliti distribusi rating dataframe. Rating terbanyak adalah 0 dan terendah adalaah 1, disini berarti Rating 0 menunjukkan pengguna belum memberikan rating eksplisit (implicit feedback)<br>
 
 
 <img width="364" height="278" alt="image" src="https://github.com/user-attachments/assets/af07c2b4-1890-49b7-9764-a99439b29a53" />
@@ -153,12 +153,31 @@ Gambar 4 Missing value dari book rating
 Melakukan transformasi pada data sehingga menjadi bentuk yang cocok untuk proses pemodelan
 
 ### Handle _Missing Value_
-Menghilangkan missing value dengan drop data tersebut.
+Pada tahap ini data dicek menggunakan isnull().sum().
+Dataset Books dan Users memiliki beberapa nilai kosong pada kolom seperti Age dan Publisher.
+Strategi yang dilakukan:
+
+Books: baris yang memiliki missing value pada kolom penting (Author, Title, Publisher) di-drop.
+
+Users: nilai Age bernilai NULL diisi dengan median (karena tipe numerik dan distribusi tidak normal).
+
 Gambar 5 
 
 <img width="114" height="156" alt="image" src="https://github.com/user-attachments/assets/6b11f678-a3ab-4e34-856b-97122eab8ba0" />
 
 Gambar 5 hasil drop missing value dari book dataset
+
+
+### Handling Duplicates
+Dataset Books memiliki:
+
+Total baris awal: 271.360
+
+Baris unik berdasarkan kombinasi Book-Title dan Book-Author: 251.185
+
+Baris duplikat yang dihapus: 20.175
+
+Duplikasi sering terjadi karena ISBN berbeda namun judul & penulis sama.
 
 ### Normalisasi nama kolom
 Hal ini untuk memudahkan proses pemrosesan kolom yang diubah "User-ID" dan "Book-Rating"
@@ -169,16 +188,37 @@ Gambar 6
 
 pada gambar 6 terlihat bahwa "User-ID" dan "Book-Rating" berubah menjadi "user_id"  dan "rating"
 
+### Encoding Label (Collaborative Filtering)
+
+CF memerlukan label berbentuk ID numerik yang rapat (0 … n).
+
+Oleh karena itu kolom:
+
+User-ID → user_encoded_to_user
+
+ISBN → book_encoded_to_book
+
+dilakukan encoding menggunakan LabelEncoder
 
 ### TF-IDF Transformation (Content-Based)
+TF-IDF yang merupakan kepanjangan dari Term Frequency-Inverse Document Frequency memiliki fungsi untuk mengukur seberapa pentingnya suatu kata terhadap kata - kata lain dalam dokumen. Umumnya menghitung skor untuk setiap kata untuk menandakan pentingnya dalam dokumen dan corpus. Metode sering digunakan dalam Information Retrieval dan Text Mining.
+lalu setelah itu akan melakukan fit dan transformasi ke dalam matriks, matriks tersebut adalah tfidf_matrix. Pada Gambar 7 tfidf_matrix terdapat 10000 ukuran data dan 5575 nama penulis buku. 
+<br>
+
+<img width="71" height="14" alt="image" src="https://github.com/user-attachments/assets/33b3473b-c8db-4c15-95fe-3f0b8e1d0d91" />
+
+Gambar 7 matriks <br>
+Cara kerja TF-IDF <br>
 - Men-transform teks “Book-Author” dan “Book-Title” menjadi fitur numerik.
-- Menghasilkan matriks TF-IDF berukuran n_books × n_features.
+- Menghasilkan matriks TF-IDF berukuran n_books × n_features. <br>
+
 
 ### Pembuatan User-Book Matrix (Collaborative Filtering)
 - Mengonversi data rating menjadi pasangan user–book untuk training model embedding.
 
+## Modeling
 
-## _1. Content Filtered Recommendation System_
+### _1. Content Filtered Recommendation System_
 
 Definisi dan Cara Kerja
 1. Definisi
@@ -240,20 +280,10 @@ Ketika pengguna memilih atau memasukkan satu buku:
 
 - Dapat memberikan rekomendasi meskipun hanya ada satu buku yang disukai pengguna.
 
-#### TF-IDF
-TF-IDF yang merupakan kepanjangan dari Term Frequency-Inverse Document Frequency memiliki fungsi untuk mengukur seberapa pentingnya suatu kata terhadap kata - kata lain dalam dokumen. Kita umumnya menghitung skor untuk setiap kata untuk menandakan pentingnya dalam dokumen dan corpus. Metode sering digunakan dalam Information Retrieval dan Text Mining.
-lalu setelah itu akan melakukan fit dan transformasi ke dalam matriks, matriks tersebut adalah tfidf_matrix. Pada Gambar 5 tfidf_matrix terdapat 10000 ukuran data dan 5575 nama penulis buku. 
-
-<br>
-
-<img width="71" height="14" alt="image" src="https://github.com/user-attachments/assets/33b3473b-c8db-4c15-95fe-3f0b8e1d0d91" />
-
-
-Gambar 7 matriks <br>
 
 
 Nilai K pada fungsi menandakan jumlah rekomendasi yang akan ditampilkan
-Atribut argpartition berguna untuk mengambil sejumlah nilai k, dalam fungsi ini 5 tertinggi dari tingkat kesamaan yang berasal dari dataframe cosine_sim_df. Kemudian, mengambil data dari bobot (tingkat kesamaan) tertinggi ke terendah. Data ini dimasukkan ke dalam variabel closest. Berikutnya, kita perlu menghapus book_title yang yang dicari agar tidak muncul dalam daftar rekomendasi. 
+Atribut argpartition berguna untuk mengambil sejumlah nilai k, dalam fungsi ini 5 tertinggi dari tingkat kesamaan yang berasal dari dataframe cosine_sim_df. Kemudian, mengambil data dari bobot (tingkat kesamaan) tertinggi ke terendah. Data ini dimasukkan ke dalam variabel closest. Berikutnya, menghapus book_title yang yang dicari agar tidak muncul dalam daftar rekomendasi. 
 
 - Mencari Rekomendasi dari buku yang sudah dibaca 
 Buku yang dibaca yaitu The Diaries of Adam and Eve berikut detailnya sesuai dengan gambar 8, ini menjadi buku yang dianggap sudah dibaca oleh user. dalam Cosine Similarity nanti akan mencari book yang mirip dengan The Diaries of Adam and Eve, sehingga perlu drop book_title The Diaries of Adam and Eve agar tidak muncul dalam daftar rekomendasi yang diberikan nanti. 
@@ -275,21 +305,25 @@ Gambar 9 lima Rekomendasi Buku<br>
 
 
 
-##  _2. Collaborative Filtered Recommendation System_
+###  _2. Collaborative Filtered Recommendation System_
 
    Collaborative Based Filtering adalah sistem rekomendasi berdasarkan pendapat suatu komunitas.
 - Kelebihan pada Collaborative Based Filtering bila dibandingkan dengan Content Based Filtering adalah pengguna dapat mengeksplorasi item atau konten di luar preferensi pengguna. Pengguna pun juga dapat mendapat rekomendasi sesuai dengan kecenderungan publik yang dianalisa lewat penilaian pengguna - pengguna lainnya.
 - Kekurangan pada Collaborative Based Filtering adalah pengguna kurang mendapatkan rekomendasi sesuai preferensi pribadi. Konten - konten yang diberikan oleh sistem rekomendasi lebih banyak berasal dari preferensi publik dan bukan preferensi pribadi.Pada Collaborative Based Filtering, menggunakan penilaian dari pengguna - pengguna untuk mendapatkan rekomendasi buku - buku.
 
-pada _Collaborative Filtered Recommendation System_ menerapkan teknik collaborative filtering untuk membuat sistem rekomendasi. Teknik ini membutuhkan data rating dari user. menghasilkan rekomendasi sejumlah buku yang sesuai dengan preferensi pengguna berdasarkan rating yang telah diberikan sebelumnya. Dari data rating pengguna, kita akan mengidentifikasi buku-buku yang mirip dan belum pernah baca oleh pengguna untuk direkomendasikan. Kita akan menggunakan teknik _collaborative filtering_ untuk membuat rekomendasi ini. 
+pada _Collaborative Filtered Recommendation System_ menerapkan teknik collaborative filtering untuk membuat sistem rekomendasi. Teknik ini membutuhkan data rating dari user. menghasilkan rekomendasi sejumlah buku yang sesuai dengan preferensi pengguna berdasarkan rating yang telah diberikan sebelumnya. Dari data rating pengguna,mengidentifikasi buku-buku yang mirip dan belum pernah baca oleh pengguna untuk direkomendasikan. Menggunakan teknik _collaborative filtering_ untuk membuat rekomendasi ini. 
 
-Pada tahap ini, model menghitung skor kecocokan antara pengguna dan buku dengan teknik embedding. Pertama, kita melakukan proses embedding terhadap data user dan buku. Selanjutnya, lakukan operasi perkalian dot product antara embedding user dan buku. Selain itu, kita juga dapat menambahkan bias untuk setiap user dan buku. Skor kecocokan ditetapkan dalam skala [0,1] dengan fungsi aktivasi sigmoid.
+Pada tahap ini, model menghitung skor kecocokan antara pengguna dan buku dengan teknik embedding. Pertama, melakukan proses embedding terhadap data user dan buku. Selanjutnya, lakukan operasi perkalian dot product antara embedding user dan buku. Selain itu, dapat menambahkan bias untuk setiap user dan buku. Skor kecocokan ditetapkan dalam skala [0,1] dengan fungsi aktivasi sigmoid.
+
+#### Split Data
+
+Dataset rating dibagi menjadi data latih dan data validasi dengan proporsi 80:20 untuk mengevaluasi performa model.
 
 #### _Binary Crossentropy_
 Model ini menggunakan Binary Crossentropy untuk menghitung loss function, Adam (Adaptive Moment Estimation) sebagai optimizer
 - Mendapatkan Rekomendasi
 mendefinisikan ulang book_datase dan rating_dataset
-akan mengambil user_id secara acak dari rating_dataset. Dari user_id ini kita perlu mengetahui buku - buku apa saja yang pernah dibaca dan yang belum pernah dibaca, sehingga kita hanya dapat merekomendasikan buku - buku yang belum dibaca.
+akan mengambil user_id secara acak dari rating_dataset. Dari user_id ini perlu mengetahui buku - buku apa saja yang pernah dibaca dan yang belum pernah dibaca, sehingga hanya dapat merekomendasikan buku - buku yang belum dibaca.
 hasilnya seperti gambar  10 ini <br>
 <br>
 Gambar 10 menampilkan rekomendasi buku buku dengan _user_ : 277195. sistem memberikan rekomendasi buku yang mungkin user juga belum membacanya dan mungkin ada kesamaan dalam suatu hal bisa dari penulis yang sama, atau mungkin rating yang bagus<br>
@@ -317,7 +351,7 @@ Nenggunakan root mean squared error (RMSE) sebagai metrics evaluation.
 <br>
 Gambar 11 Hasil _Training model_<br>
 
-Perhatikanlah pada gambar 11, proses training model cukup smooth dan model konvergen pada epochs sekitar 30. Dari proses ini, kita memperoleh nilai error akhir sebesar sekitar 0.1999 dan error pada data validasi sebesar 0.3429. 
+Perhatikanlah pada gambar 11, proses training model cukup smooth dan model konvergen pada epochs sekitar 30. Dari proses ini, memperoleh nilai error akhir sebesar sekitar 0.1999 dan error pada data validasi sebesar 0.3429. 
 
 ### Kesimpulan 
 1. Pendekatan content-based filtering berhasil memberikan rekomendasi buku yang relevan berdasarkan kemiripan fitur, terutama penulis.
@@ -329,6 +363,7 @@ Perhatikanlah pada gambar 11, proses training model cukup smooth dan model konve
 
 Referensi Jurnal : <br>
 [1]	A. Suryana, I. B. Zaki, J. Sua, G. Phua, J. Jekson, and C. Celvin, “Pentingnya Membaca Buku bagi Generasi Baru di Era Teknologi Bersama Komunitas Ayobacabatam,” Natl. Conf. Community Serv. Proj., vol. 3, pp. 715–720, 2021, [Online]. Available: https://journal.uib.ac.id/index.php/nacospro/article/view/6010
+
 
 
 
