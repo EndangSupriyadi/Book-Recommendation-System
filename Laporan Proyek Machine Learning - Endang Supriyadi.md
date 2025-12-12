@@ -1,16 +1,23 @@
 # Laporan Proyek Rekomendasi Machine Learning - Endang Supriyadi
 
 ## Domain Proyek
-Membaca adalah suatu proses yang dilakukan oleh pembaca untuk menerima pesan atau informasi yang  disampaikan  oleh  penulis  melalui  media  kata-kata  atau  bahasa  tulis. Dengan membaca dapat memahami dengan luas topik yang  dibaca. Seiring berjalannya waktu banyak orang yang  melupakan  betapa  pentingnya  membaca buku. membaca buku merupakan sumber informasi, buku merupakan jendela dunia, Dengan makin sering seseorang membaca akan memengaruhi fungsi otak dan mengingkatkan memori sesorang [1]. Kadang dalam sebuah perpustakaan orang bingung buku apa saja yang iya ingin baca karena buku dalam perpustakaan itu banyak, maka dari itu diperlukannya sebuah rekomendasi buku sesuai riwayat peminjaman atau buku yang banyak digemari saat ini. hal tersebut bisa sangat membantu orang ketika ingin mencari buku yang digemari.
+Membaca merupakan proses menerima dan memahami informasi yang disampaikan penulis melalui media tulisan. Aktivitas membaca memiliki peran penting dalam memperluas wawasan, meningkatkan kemampuan berpikir kritis, serta memperkuat daya ingat seseorang [1]. Namun, seiring berkembangnya teknologi dan kemudahan akses hiburan digital, minat membaca buku cenderung mengalami penurunan.
+
+Di sisi lain, perpustakaan maupun platform penyedia buku memiliki koleksi yang sangat besar, sehingga pengguna sering mengalami kesulitan dalam menentukan buku mana yang ingin dibaca. Jumlah pilihan yang terlalu banyak (information overload) membuat pengalaman pencarian buku menjadi kurang efisien. Oleh karena itu, diperlukan sebuah sistem rekomendasi buku yang mampu membantu pengguna menemukan buku yang sesuai minat, riwayat bacaan, ataupun tren bacaan saat ini.
+
+Sistem rekomendasi tersebut dapat meningkatkan pengalaman pengguna, mempermudah proses pencarian buku, serta membantu memperkenalkan koleksi buku yang relevan bagi pembaca baru maupun pembaca yang ingin mengeksplorasi topik berbeda.
 
 
 ## _Business Understanding_
 1. Problem Statements
-- Bagaimana membuat sistem rekomendasi yang dipersonalisasi dengan teknik content-based filtering agar bisa membantu orang dalam memilih buku yang bertipe sama sesuai riwayat pemakaian bukunya?
-- Bagaimana membuat merekomendasikan buku kepada orang lain yang belum memiliki riwayat pemakaian buku atau orang yang ingin membaca buku dengan topik yang berbeda sebelumnya? 
+
+- Bagaimana membangun sistem rekomendasi yang dipersonalisasi menggunakan teknik content-based filtering agar dapat membantu pengguna menemukan buku yang memiliki karakteristik atau tipe serupa dengan riwayat bacaan sebelumnya?
+- Bagaimana memberikan rekomendasi kepada pengguna yang belum memiliki riwayat bacaan (cold-start user) atau pengguna yang ingin membaca buku dengan topik berbeda menggunakan pendekatan collaborative filtering?
+
 2. Goals
-- Menghasilkan sejumlah rekomendasi buku yang dipersonalisasi untuk pengguna dengan teknik content-based filtering agar bisa dengan mudah mencari buku yang bertipe sama dengan riwayat pemakaiannya.
-- Menghasilkan sejumlah rekomendasi buku yang sesuai dengan preferensi pengguna dan belum pernah dikunjungi sebelumnya dengan teknik collaborative filtering agar orang yang baru memakai buku atau ingin membaca buku bertipe berbeda dari sebelumnya bisa mendapatkan rekomendasi yang mungkin sedang banyak digemari saat ini.
+
+- Menghasilkan rekomendasi buku yang dipersonalisasi menggunakan content-based filtering sehingga pengguna dapat menemukan buku yang mirip dengan buku yang pernah dibaca, misalnya berdasarkan penulis, genre, atau kata kunci tertentu.
+- Menghasilkan rekomendasi buku berbasis collaborative filtering bagi pengguna baru atau pengguna dengan preferensi bacaan berbeda, sehingga mereka mendapatkan rekomendasi dari pola perilaku pengguna lain yang memiliki kesamaan minat.
 
 
 ## _Data Understanding_
@@ -245,6 +252,7 @@ Perhatikanlah pada gambar 6, proses training model cukup smooth dan model konver
 
 Referensi Jurnal : <br>
 [1]	A. Suryana, I. B. Zaki, J. Sua, G. Phua, J. Jekson, and C. Celvin, “Pentingnya Membaca Buku bagi Generasi Baru di Era Teknologi Bersama Komunitas Ayobacabatam,” Natl. Conf. Community Serv. Proj., vol. 3, pp. 715–720, 2021, [Online]. Available: https://journal.uib.ac.id/index.php/nacospro/article/view/6010
+
 
 
 
