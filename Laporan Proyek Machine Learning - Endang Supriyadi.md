@@ -81,8 +81,7 @@ sumber dataset https://www.kaggle.com/datasets/arashnic/book-recommendation-data
 
 
 
-
-### _Eksploratory Data_
+### _Eksploratory Data Analisis_
 - Membaca dataset <br>
 Pertama arahkan alamat path penyimpanan dataset , setalah itu membaca dan menampilkan data dengan "read_csv" pastikan dataset berformat csv. untuk melihat jumlah data dalam dataset gunakan "dataset.shape". 
 
@@ -113,92 +112,126 @@ Pertama arahkan alamat path penyimpanan dataset , setalah itu membaca dan menamp
    |4|0393045218|The Mummies of Urumchi       |E. J. W. Barber	     |1999                     |W. W. Norton &amp; Company|
 <br>
 
-pada dataset ini terdapat <br>
-Total Baris Awal: 271360 <br>
-Jumlah Baris Unik (berdasarkan Title & Author): 251185 <br>
-Jumlah Baris Duplikat yang Akan Dihapus: 20175 <br>
-
 
    Pada gambar 1 yaitu memvisualisasikan dan meneliti distribusi rating dataframe. Rating terbanyak adalah 0 dan terendah adalaah 1, disini berarti Rating 0 menunjukkan pengguna belum memberikan rating eksplisit (implicit feedback)<br>
 
 
 <img width="364" height="278" alt="image" src="https://github.com/user-attachments/assets/af07c2b4-1890-49b7-9764-a99439b29a53" />
 <br />
-gambar 1. Distribusi Rating <br>
+gambar 1. Distribusi Rating <br/>
 
 Pada gambar 2 memvisualisasikan dan meneliti distribusi tahun terbitnya buku dari book dataframe disini data tahun terbit cenderung meningkat setiap tahunnya. Terbanyak tahun 2002, dataset ini terdiri dari tahun 1955 sampai dengan 2002. disini berarti semakin banyak orang membaca buku setiap tahunnya<br>
 
 
-<img width="395" height="213" alt="image" src="https://github.com/user-attachments/assets/7c6633f1-b1da-4a04-a264-edaba8bc6c87" />
+<img width="776" height="346" alt="image" src="https://github.com/user-attachments/assets/091b3518-6de7-4f59-97c6-47b7d8e4cfda" />
 
 gambar 2. Distribusi tahun terbitnya buku <br>
+
+#### Cek Duplikasi Book Dataset
+Total Baris Awal: 271360 <br>
+Jumlah Baris Unik (berdasarkan Title & Author): 251185 <br>
+Jumlah Baris Duplikat yang Akan Dihapus: 20175 <br>
+
+#### Cek Duplikasi Rating Dataset
+Total Baris: 1149780 <br>
+Jumlah Baris Duplikat: 0 <br>
 
 #### Cek Missing Value
 
 Gambar 3 
 
-<img width="117" height="193" alt="image" src="https://github.com/user-attachments/assets/bae5fa64-a844-4f90-9360-2c57db9b5a3c" />
+<img width="105" height="145" alt="image" src="https://github.com/user-attachments/assets/0e0978b2-c2f9-494b-a457-c89fe0401de6" />
 
-Gambar 3 Missing value dari dataset book
+Gambar 3 Missing value dari book dataset
 
 Gambar 4 
 
-<img width="83" height="83" alt="image" src="https://github.com/user-attachments/assets/c7eb3bbc-cb0e-4cc8-ba45-3f245ea70028" />
+<img width="87" height="76" alt="image" src="https://github.com/user-attachments/assets/e16f8524-6e6a-4037-9062-fbc7fa8ee30b" />
 
-Gambar 4 Missing value dari book rating
+Gambar 4 Missing value dari rating dataset
 
 
 ## _Data Preparation_
-<br>
 Melakukan transformasi pada data sehingga menjadi bentuk yang cocok untuk proses pemodelan
 
-### Handle _Missing Value_
-Pada tahap ini data dicek menggunakan isnull().sum().
-Dataset Books dan Users memiliki beberapa nilai kosong pada kolom seperti Age dan Publisher.
-Strategi yang dilakukan:
+### Menghapus Baris Duplikat
+```# Menghapus baris duplikat
+book_dataset = book_dataset.drop_duplicates(subset=['Book-Title', 'Book-Author'], keep='first')
 
-Books: baris yang memiliki missing value pada kolom penting (Author, Title, Publisher) di-drop.
+print(f"\nTotal Baris Setelah Duplikasi Dihapus: {len(book_dataset)}")
+```
 
-Users: nilai Age bernilai NULL diisi dengan median (karena tipe numerik dan distribusi tidak normal).
+Total Baris Setelah Duplikasi Dihapus: 251185
+
+
+### Hapus _Missing Value_
+```# Menghapus Missing value book_dataset
+book_dataset = book_dataset.dropna(axis=0)
+book_dataset.isnull().sum()
+```
+
 
 Gambar 5 
 
-<img width="114" height="156" alt="image" src="https://github.com/user-attachments/assets/6b11f678-a3ab-4e34-856b-97122eab8ba0" />
+<img width="97" height="124" alt="image" src="https://github.com/user-attachments/assets/7d63fb67-14a1-4d34-acac-53e6cbe860cc" />
 
 Gambar 5 hasil drop missing value dari book dataset
 
 
-### Handling Duplicates
-Dataset Books memiliki:
+### Filter Year-Of-Publication yang bukan 0
+```book_dataset = book_dataset[book_dataset['Year-Of-Publication'] != 0]```
 
-Total baris awal: 271.360
+hal ini dilakukan agar year-of-publication tidak sama dengan 0
 
-Baris unik berdasarkan kombinasi Book-Title dan Book-Author: 251.185
 
-Baris duplikat yang dihapus: 20.175
+### Normalisasi nama kolom Rating dataset
+```# Normalisasi Nama Kolom Rating dataset
+rating_dataset = rating_dataset.rename(columns={'Book-Rating': 'rating','User-ID':'user_id'})
+```
+### Normalisasi nama kolom Book dataset
+```# Normalisasi Nama Kolom Book dataset
+book_dataset = book_dataset.rename(columns={'Book-Title': 'book_title','Book-Author':'book_author','Year-Of-Publication':'year_of_publication','Image-URL-S':'Image_URL_S','Image-URL-M':'Image_URL_M','Image-URL-L':'Image_URL_L'})
+```
 
-Duplikasi sering terjadi karena ISBN berbeda namun judul & penulis sama.
+### Membatasi Jumlah Data
+```book_dataset = book_dataset[:10000]```
 
-### Normalisasi nama kolom
-Hal ini untuk memudahkan proses pemrosesan kolom yang diubah "User-ID" dan "Book-Rating"
-dengan hasil <br>
-Gambar 6
+mengambil 10.000 baris pertama dari book_dataset <br>
+```rating_dataset=rating_dataset[:5000]```
 
-<img width="126" height="98" alt="image" src="https://github.com/user-attachments/assets/79ddb5a7-55db-4887-b202-289adc623202" />
+mengambil 5.000 baris pertama dari rating_dataset
 
-pada gambar 6 terlihat bahwa "User-ID" dan "Book-Rating" berubah menjadi "user_id"  dan "rating"
 
-### Encoding Label (Collaborative Filtering)
 
-CF memerlukan label berbentuk ID numerik yang rapat (0 … n).
+### Encoding ID User di rating dataset
+proses encoding ID user → mengubah User-ID asli menjadi index numerik berurutan yang digunakan Collaborative Filtering
 
-Oleh karena itu kolom:
+### Encoding ISBN di rating dataset
+proses encoding ISBN -> mengubah ISBN asli menjadi index numerik berurutan yang digunakan Collaborative Filtering
 
-User-ID → user_encoded_to_user
+### Mengubah Type data rating ke float
+```num_users = len(user_encoded_to_user)
+print(num_users)
+num_book = len(book_encoded_to_book)
+print(num_book)
+rating_dataset['rating'] = rating_dataset['rating'].values.astype(np.float32)
 
-ISBN → book_encoded_to_book
+min_rating = min(rating_dataset['rating'])
+max_rating = max(rating_dataset['rating'])
 
-dilakukan encoding menggunakan LabelEncoder
+print('Number of User: {}, Number of Book: {}, Min Rating: {}, Max Rating: {}'.format(
+    num_users, num_book, min_rating, max_rating
+))
+```
+
+679
+4688
+Number of User: 679, Number of Book: 4688, Min Rating: 0.0, Max Rating: 10.0
+
+#### Split Data
+
+Dataset rating dibagi menjadi data latih dan data validasi dengan proporsi 80:20 untuk mengevaluasi performa model.
+
 
 ### TF-IDF Transformation (Content-Based)
 TF-IDF yang merupakan kepanjangan dari Term Frequency-Inverse Document Frequency memiliki fungsi untuk mengukur seberapa pentingnya suatu kata terhadap kata - kata lain dalam dokumen. Umumnya menghitung skor untuk setiap kata untuk menandakan pentingnya dalam dokumen dan corpus. Metode sering digunakan dalam Information Retrieval dan Text Mining.
@@ -315,9 +348,7 @@ pada _Collaborative Filtered Recommendation System_ menerapkan teknik collaborat
 
 Pada tahap ini, model menghitung skor kecocokan antara pengguna dan buku dengan teknik embedding. Pertama, melakukan proses embedding terhadap data user dan buku. Selanjutnya, lakukan operasi perkalian dot product antara embedding user dan buku. Selain itu, dapat menambahkan bias untuk setiap user dan buku. Skor kecocokan ditetapkan dalam skala [0,1] dengan fungsi aktivasi sigmoid.
 
-#### Split Data
 
-Dataset rating dibagi menjadi data latih dan data validasi dengan proporsi 80:20 untuk mengevaluasi performa model.
 
 #### _Binary Crossentropy_
 Model ini menggunakan Binary Crossentropy untuk menghitung loss function, Adam (Adaptive Moment Estimation) sebagai optimizer
@@ -330,7 +361,8 @@ Gambar 10 menampilkan rekomendasi buku buku dengan _user_ : 277195. sistem membe
 
 Gambar. 10 Rekomendasi Buku <br>
 
-<img width="491" height="135" alt="image" src="https://github.com/user-attachments/assets/dd9950d9-e5e2-4210-8908-a4fdf9fe00a3" />
+<img width="268" height="125" alt="image" src="https://github.com/user-attachments/assets/ff2476e4-1aac-4472-ab07-294689e34503" />
+
 
 
 
@@ -347,11 +379,12 @@ jadi precision : 5/5 = 100% sama
 
 Nenggunakan root mean squared error (RMSE) sebagai metrics evaluation. 
 
-<img width="289" height="220" alt="image" src="https://github.com/user-attachments/assets/4dbc9bf7-d168-4c8a-b6fc-edce94fdddde" />
+<img width="258" height="202" alt="image" src="https://github.com/user-attachments/assets/a15be9a6-5253-44ba-9faf-d8d9ae502423" />
+
 <br>
 Gambar 11 Hasil _Training model_<br>
 
-Perhatikanlah pada gambar 11, proses training model cukup smooth dan model konvergen pada epochs sekitar 30. Dari proses ini, memperoleh nilai error akhir sebesar sekitar 0.1999 dan error pada data validasi sebesar 0.3429. 
+Perhatikanlah pada gambar 11, proses training model cukup smooth dan model konvergen pada epochs sekitar 30. Dari proses ini, memperoleh nilai error akhir sebesar sekitar 0.1998 dan error pada data validasi sebesar 0.3436. 
 
 ### Kesimpulan 
 1. Pendekatan content-based filtering berhasil memberikan rekomendasi buku yang relevan berdasarkan kemiripan fitur, terutama penulis.
@@ -363,6 +396,7 @@ Perhatikanlah pada gambar 11, proses training model cukup smooth dan model konve
 
 Referensi Jurnal : <br>
 [1]	A. Suryana, I. B. Zaki, J. Sua, G. Phua, J. Jekson, and C. Celvin, “Pentingnya Membaca Buku bagi Generasi Baru di Era Teknologi Bersama Komunitas Ayobacabatam,” Natl. Conf. Community Serv. Proj., vol. 3, pp. 715–720, 2021, [Online]. Available: https://journal.uib.ac.id/index.php/nacospro/article/view/6010
+
 
 
 
